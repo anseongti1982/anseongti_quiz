@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>농심천심 10문10답</title>
+    <style>
+        :root {
+            --primary-color: #2E7D32; /* 농촌의 짙은 녹색 */
+            --secondary-color: #81C784; /* 연한 녹색 */
+            --accent-color: #FFEB3B; /* 햇살 노란색 */
+            --sky-color: #4FC3F7; /* 하늘색 */
+            --text-color: #333;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+        }
+
+        body {
+            /* 농촌 풍경 배경 (CSS로 구현: 하늘과 들판) */
+            background: linear-gradient(to bottom, var(--sky-color) 0%, var(--sky-color) 60%, var(--primary-color) 60%, #1B5E20 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* 구름 효과 (장식) */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            z-index: 0;
+        }
+        .c1 { width: 100px; height: 40px; top: 10%; left: 10%; animation: float 20s infinite linear; }
+        .c2 { width: 140px; height: 60px; top: 20%; left: 70%; animation: float 25s infinite linear; }
+
+        @keyframes float {
+            from { transform: translateX(-50px); }
+            to { transform: translateX(50px); }
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2rem;
+            word-break: keep-all;
+        }
+
+        h2 {
+            color: #555;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn:hover {
+            background-color: #1B5E20;
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 퀴즈 화면 스타일 */
+        .quiz-section {
+            display: none;
+            text-align: left;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .badge-hard { background-color: #E53935; }
+        .badge-medium { background-color: #FB8C00; }
+        .badge-easy { background-color: #43A047; }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background-color: white;
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-color);
+            background-color: #f1f8e9;
+        }
+
+        .option-btn.correct {
+            background-color: #C8E6C9;
+            border-color: #2E7D32;
+            color: #1B5E20;
+        }
+
+        .option-btn.wrong {
+            background-color: #FFCDD2;
+            border-color: #C62828;
+            color: #B71C1C;
+        }
+
+        .hint-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #FFF3E0;
+            border-left: 5px solid #FF9800;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .next-btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* 결과 화면 스타일 */
+        .result-section {
+            display: none;
+        }
+
+        .result-time {
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin: 20px 0;
+            background: #f1f8e9;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 모바일 대응 */
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+            h1 { font-size: 1.5rem; }
+            .question-text { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+
+    <div class="container">
+        <div id="start-screen">
+            <h1>농심천심<br>10문 10답</h1>
+            <div style="font-size: 4rem; margin: 20px 0;">🌾</div>
+            <h2>10문제에 도전해 보세요.<br>궁금한 것은 힌트를 누르시고,<br>맞추시면 다음 버튼을 눌러주세요.</h2>
+            <button class="btn" onclick="startQuiz()">도전 시작하기</button>
+        </div>
+
+        <div id="quiz-screen" class="quiz-section">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div id="difficulty-badge" class="question-badge badge-easy">난이도</div>
+            <div id="question-text" class="question-text">문제 내용이 여기에 표시됩니다.</div>
+            
+            <div id="options-container" class="options-grid">
+                </div>
+
+            <div id="hint-box" class="hint-box">
+                <strong>💡 힌트:</strong> <span id="hint-text"></span>
+            </div>
+
+            <div class="next-btn-container">
+                <button id="next-btn" class="btn" onclick="nextQuestion()" style="display: none;">다음 문제</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="result-section">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+            <h1>농심천심 달성!</h1>
+            <p>축하합니다. 모든 문제를 해결하셨습니다.</p>
+            <div class="result-time" id="final-time">00:00:00</div>
+            <button class="btn" onclick="location.reload()">다시 도전하기</button>
+        </div>
+        
+        <div class="footer">자료출처: 농심천심 운동 요약본</div>
+    </div>
+
+    <script>
+        // 문제 데이터베이스 (총 30문제: 상10, 중10, 하10)
+        // 자료 출처: 제공된 PDF 텍스트
+        const questionBank = [
+            // --- 난이도 하 (10문제) ---
+            {
+                id: 1, type: '하',
+                q: "'농심천심(農心天心)'의 뜻으로 가장 적절한 것은 무엇입니까?",
+                options: ["농부의 마음은 흔들리기 쉽다", "농부의 마음이 곧 하늘의 뜻이다", "농업은 기술이 가장 중요하다", "하늘의 날씨가 농사를 결정한다"],
+                a: 1,
+                hint: "국민의 먹거리를 생산하는 농부의 마음을 이해하는 것이 하늘의 뜻을 실현하는 것입니다."
+            },
+            {
+                id: 2, type: '하',
+                q: "농심천심 운동의 3대 추진 전략이 아닌 것은 무엇입니까?",
+                options: ["농업·농촌 가치 공감", "농업가치 증대", "농촌공간가치 증대", "농산물 수출 확대"],
+                a: 3,
+                hint: "3대 전략은 '공감', '농업가치 증대', '농촌공간가치 증대'입니다. 수출 확대는 명시된 전략명이 아닙니다."
+            },
+            {
+                id: 3, type: '하',
+                q: "우리 농산물을 애용하자는 운동으로, 농심천심 운동이 계승·발전시키고자 하는 과거의 운동은?",
+                options: ["새마을 운동", "신토불이 운동", "금모으기 운동", "물산장려 운동"],
+                a: 1,
+                hint: "몸과 땅은 둘이 아니라는 뜻으로, 1989년부터 시작된 우리 농산물 애용 운동입니다."
+            },
+            {
+                id: 4, type: '하',
+                q: "농심천심 운동의 추진 배경과 거리가 먼 것은?",
+                options: ["대국민 농업 인식 저하", "기후변화 및 식량안보 이슈", "인구 증가로 인한 농촌 과밀화", "지역소멸 위기 대응"],
+                a: 2,
+                hint: "현재 농촌은 인구 증가가 아니라 '인구 감소'와 '지역소멸 위기'를 겪고 있습니다."
+            },
+            {
+                id: 5, type: '하',
+                q: "다음 중 '농업가치 증대' 전략(농업인 주체)에 해당하는 과제는?",
+                options: ["스쿨팜", "우수 농축산물 안정 공급", "농촌 여행", "농산물 소비 촉진"],
+                a: 1,
+                hint: "농업인의 역할은 우수한 농축산물을 안정적으로 공급하는 체계를 구축하는 것입니다."
+            },
+            {
+                id: 6, type: '하',
+                q: "'농심천심' 운동에서 국민과 함께하는 슬로건 문구는?",
+                options: ["국민과 농업인이 함께! 농업·농촌 가치 확산!", "농업인만 잘사는 세상", "도시민을 위한 농촌 개발", "수입 농산물 개방 확대"],
+                a: 0,
+                hint: "국민과 농업인이 '함께' 하며 가치를 '확산'하는 것이 목표입니다."
+            },
+            {
+                id: 7, type: '하',
+                q: "10대 추진과제 중 '농가치 국민 참여'를 위해 운영하는 것은?",
+                options: ["해외 유학 지원단", "농촌일손·재능나눔 국민참여단", "스마트팜 연구소", "귀농 귀촌 센터"],
+                a: 1,
+                hint: "국민이 직접 농촌의 일손을 돕거나 재능을 나누는 참여단을 운영합니다."
+            },
+            {
+                id: 8, type: '하',
+                q: "농심천심 운동의 비전은 무엇입니까?",
+                options: ["지속가능한 농업·농촌 구현", "농산물 가격 인하", "도시 개발 가속화", "농업 인구 100% 달성"],
+                a: 0,
+                hint: "농업·농촌의 가치 공감과 활력화를 통해 '지속가능한 농업·농촌'을 만드는 것입니다."
+            },
+            {
+                id: 9, type: '하',
+                q: "도시와 농촌의 교류를 뜻하는 '도농교류'와 관련된 기존 운동 명칭은?",
+                options: ["농도불이(農都不二)", "새농민 운동", "식사랑 농사랑", "4차 산업혁명"],
+                a: 0,
+                hint: "농촌과 도시는 둘이 아니라는 뜻의 1995년 운동입니다."
+            },
+            {
+                id: 10, type: '하',
+                q: "과거 세종실록에 나온 말로 '백성은 먹는 것을 하늘로 삼는다'는 뜻의 한자어는?",
+                options: ["민이식위천(民以食爲天)", "결자해지", "주경야독", "농자천하지대본"],
+                a: 0,
+                hint: "백성(民)은 먹는 것(食)으로써(以) 하늘(天)을 삼는다는 뜻입니다."
+            },
+
+            // --- 난이도 중 (10문제) ---
+            {
+                id: 11, type: '중',
+                q: "'농업·농촌 가치 공감' 전략의 세부 과제 중 '농산물 소비 촉진' 활동에 해당하지 않는 것은?",
+                options: ["밥심천심", "통합 Day 마케팅", "착한 소비", "보급형 스마트팜"],
+                a: 3,
+                hint: "보급형 스마트팜은 '미래농업 선도' 과제로, 농산물 생산 및 공급과 관련이 있습니다."
+            },
+            {
+                id: 12, type: '중',
+                q: "농심천심 운동의 3대 주체가 아닌 것은?",
+                options: ["국민", "농업인", "농협(및 정부/지자체)", "해외바이어"],
+                a: 3,
+                hint: "운동 주체는 국민, 농업인, 그리고 변화와 혁신을 이끄는 농협(협력: 정부/지자체)입니다."
+            },
+            {
+                id: 13, type: '중',
+                q: "'농촌공간가치 증대' 전략에서 '생활인구 창출'을 위해 추진하는 사업은?",
+                options: ["지자체 MOU 농촌여행 신사업", "스마트 APC", "영농인력공급 확대", "우리농 건강 365"],
+                a: 0,
+                hint: "생활인구 창출은 사람들이 농촌을 방문하고 머물게 하는 것으로, 농촌여행 신사업과 관련 있습니다."
+            },
+            {
+                id: 14, type: '중',
+                q: "다음 중 '미래농업 선도'를 위한 구체적인 실행 방안은?",
+                options: ["이동장터 운영", "태양광사업 확산 및 보급형 스마트팜", "주말농장 운영", "1사 1촌 자매결연"],
+                a: 1,
+                hint: "미래농업은 기술과 에너지 효율을 높이는 스마트팜과 태양광 사업이 핵심입니다."
+            },
+            {
+                id: 15, type: '중',
+                q: "'농업가치 증대' 전략의 목표로 가장 적절한 설명은?",
+                options: ["우수 농축산물 안정적 공급체계 구축", "우리 농산물 소비 촉진", "삶터·일터·쉼터로서의 가치 재창출", "도농교류 증대"],
+                a: 0,
+                hint: "소비 촉진은 '국민'의 역할이고, '농업인'은 우수 농축산물을 안정적으로 공급하여 농업 가치를 높입니다."
+            },
+            {
+                id: 16, type: '중',
+                q: "농협의 농업·농촌운동 연혁 중 2011년에 시작된 '식생활문화 개선' 운동은?",
+                options: ["식사랑 농사랑 운동", "새농민 운동", "또 하나의 마을 만들기", "농촌사랑 운동"],
+                a: 0,
+                hint: "먹거리(食)와 농업(農)을 사랑하자는 운동입니다."
+            },
+            {
+                id: 17, type: '중',
+                q: "'농가치 캠페인'의 구체적 활동 사례로 묶인 것은?",
+                options: ["우리농 건강 365, 스쿨팜, 주말농장", "농작업 대행, 영농인력공급", "농촌 공간 개선, 경관 가꾸기", "귀농·귀촌 활성화"],
+                a: 0,
+                hint: "농가치 캠페인은 국민들이 농업을 체험하고 건강을 챙기는 활동들(스쿨팜, 주말농장 등)입니다."
+            },
+            {
+                id: 18, type: '중',
+                q: "'지역농업 발전' 과제를 위해 육성하고자 하는 시설은?",
+                options: ["스마트 APC (산지유통센터)", "대형 마트", "전통시장", "농촌 마을회관"],
+                a: 0,
+                hint: "지역 특화사업 육성과 함께 스마트화된 농산물 산지유통센터(Smart APC)가 언급되었습니다."
+            },
+            {
+                id: 19, type: '중',
+                q: "농심천심 운동의 선순환 구조: 국민의 ( A ) 공유 ➡️ 농업인의 ( B ) 증대",
+                options: ["A: 농업가치, B: 농업가치", "A: 소득, B: 생산량", "A: 기술, B: 인력", "A: 토지, B: 자본"],
+                a: 0,
+                hint: "국민이 농업가치를 '공유/공감'해주면, 농업인은 이를 바탕으로 '농업가치'를 더욱 증대시키는 선순환입니다."
+            },
+            {
+                id: 20, type: '중',
+                q: "귀농·귀촌 활성화를 위해 운영하는 프로그램은?",
+                options: ["농촌 장·단기 체류 및 농촌살기 시범마을", "해외 농업 연수", "도시 농부 학교", "농기계 무료 임대"],
+                a: 0,
+                hint: "농촌에 직접 살아보는 경험을 제공하는 장·단기 체류 프로그램입니다."
+            },
+
+            // --- 난이도 상 (10문제) ---
+            {
+                id: 21, type: '상',
+                q: "'농심천심'이라는 표현과 맥을 같이하는 세종실록의 문구 '나라는 백성을 근본으로 삼고...'의 뒷부분은?",
+                options: ["백성은 먹는 것을 하늘로 삼는다 (국이민위본 민이식위천)", "농업은 천하의 큰 근본이다 (농자천하지대본)", "백성의 마음이 곧 천심이다", "식량이 곧 안보이다"],
+                a: 0,
+                hint: "國以民爲本(국이민위본), 民以食爲天(민이식위천)입니다."
+            },
+            {
+                id: 22, type: '상',
+                q: "농심천심 운동의 3대 전략 중 '농촌공간가치 증대'에서 농촌을 어떤 공간으로 재창출하고자 하는가?",
+                options: ["삶터, 일터, 쉼터", "생산터, 판매터, 소비터", "관광지, 유적지, 휴양지", "주거지, 상업지, 공업지"],
+                a: 0,
+                hint: "농촌은 단순히 농사만 짓는 곳이 아니라 사는 곳(삶터), 일하는 곳(일터), 쉬는 곳(쉼터)이어야 합니다."
+            },
+            {
+                id: 23, type: '상',
+                q: "10대 추진과제 중 '청년농업인 영농정착 단계별 지원'이 포함된 카테고리는?",
+                options: ["미래농업인 육성", "인력공급 체계화", "생활인구 창출", "농촌재생"],
+                a: 0,
+                hint: "청년농업인은 농촌의 '미래'를 이끌어갈 인재입니다."
+            },
+            {
+                id: 24, type: '상',
+                q: "'인력공급 체계화' 과제에서 언급된 구체적인 서비스 형태는?",
+                options: ["농작업 대행", "외국인 노동자 전면 개방", "무인 로봇 전면 도입", "대학생 봉사활동 의무화"],
+                a: 0,
+                hint: "농가의 일손 부족을 덜어주기 위해 농작업을 대신해주는 대행 서비스가 포함됩니다."
+            },
+            {
+                id: 25, type: '상',
+                q: "농협의 농업·농촌운동 연혁 순서가 올바른 것은?",
+                options: ["새농민(1965) - 신토불이(1989) - 농도불이(1995) - 농촌사랑(2003)", "신토불이 - 새농민 - 농도불이 - 농촌사랑", "농촌사랑 - 신토불이 - 새농민 - 농도불이", "새농민 - 농촌사랑 - 신토불이 - 농도불이"],
+                a: 0,
+                hint: "새농민(60년대) -> 신토불이(80년대) -> 농도불이(90년대) -> 농촌사랑(2000년대) 순입니다."
+            },
+            {
+                id: 26, type: '상',
+                q: "'농촌재생' 과제의 세부 활동으로, 장날 등이 아닌 날에도 찾아가는 시장 형태를 무엇이라 하는가?",
+                options: ["이동장터", "새벽배송", "야시장", "온라인 직거래"],
+                a: 0,
+                hint: "농촌 공간 개선 및 경관 가꾸기와 함께 언급된 '이동장터'입니다."
+            },
+            {
+                id: 27, type: '상',
+                q: "농심천심 운동의 선순환 다이어그램에서 '농촌공간가치 증대'를 통해 얻는 효과(화살표)는?",
+                options: ["경관/문화/관광/치유·힐링", "농산물 가격 안정", "식량 생산량 증대", "농기계 수출"],
+                a: 0,
+                hint: "농촌 공간이 살아나면 경관, 문화, 관광, 치유 등의 가치가 국민에게 제공됩니다."
+            },
+            {
+                id: 28, type: '상',
+                q: "'또 하나의 마을 만들기' 운동이 시작된 연도는?",
+                options: ["2016년", "2011년", "2003년", "1995년"],
+                a: 0,
+                hint: "사회지도층을 명예이장으로 위촉하며 시작된 이 운동은 2016년에 시작되었습니다."
+            },
+            {
+                id: 29, type: '상',
+                q: "전략 1(가치공감)과 전략 2(가치증대) 사이의 상호 작용 내용은?",
+                options: ["우리농축산물 소비촉진 <-> 우수 농축산물 안정공급", "농촌관광 <-> 귀농귀촌", "기술개발 <-> 인력지원", "자금지원 <-> 정책수립"],
+                a: 0,
+                hint: "국민은 소비를 촉진하고, 농업인은 안정적으로 공급하는 것이 두 전략 간의 연결고리입니다."
+            },
+            {
+                id: 30, type: '상',
+                q: "'농심천심' 운동에서 '농심(農心)'이 의미하는 바로 가장 정확한 요약은?",
+                options: ["국민의 먹거리를 생산하는 농부의 마음", "농산물을 비싸게 팔고 싶은 마음", "도시로 나가고 싶은 마음", "전통을 고수하려는 고집"],
+                a: 0,
+                hint: "이 마음을 이해하고 중요시하는 것이 하늘의 뜻을 실현하는 길이라고 했습니다."
+            }
+        ];
+
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let startTime;
+        let timerInterval;
+
+        // 게임 시작
+        function startQuiz() {
+            // 문제 선별 (상3, 중4, 하3)
+            const easy = shuffle(questionBank.filter(q => q.type === '하')).slice(0, 3);
+            const medium = shuffle(questionBank.filter(q => q.type === '중')).slice(0, 4);
+            const hard = shuffle(questionBank.filter(q => q.type === '상')).slice(0, 3);
+
+            // 전체 10문제를 다시 섞음
+            currentQuestions = shuffle([...easy, ...medium, ...hard]);
+            currentIndex = 0;
+
+            // UI 전환
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+
+            // 타이머 시작
+            startTime = new Date();
+
+            // 첫 문제 로드
+            loadQuestion();
+        }
+
+        // 배열 섞기 (Fisher-Yates Shuffle)
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 문제 로드
+        function loadQuestion() {
+            const qData = currentQuestions[currentIndex];
+            const badge = document.getElementById('difficulty-badge');
+            
+            // 난이도 배지 설정
+            badge.className = 'question-badge';
+            if(qData.type === '상') badge.classList.add('badge-hard');
+            else if(qData.type === '중') badge.classList.add('badge-medium');
+            else badge.classList.add('badge-easy');
+            badge.innerText = `난이도: ${qData.type}`;
+
+            // 문제 텍스트
+            document.getElementById('question-text').innerText = `${currentIndex + 1}. ${qData.q}`;
+
+            // 보기 생성
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            // 보기 섞어서 출력 (정답 위치 랜덤화) - 원본 인덱스를 기억해야 함
+            // qData.options는 배열. 정답 인덱스는 qData.a
+            // 표시용 배열 생성: {text: "보기내용", index: 0}
+            let displayOptions = qData.options.map((opt, idx) => ({text: opt, originalIndex: idx}));
+            // 보기 순서만 섞기 (선택사항, 여기서는 보기도 섞어줌)
+            // displayOptions = shuffle(displayOptions); // 보기도 섞고 싶으면 주석 해제
+
+            displayOptions.forEach((opt) => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => checkAnswer(btn, opt.originalIndex, qData);
+                optionsContainer.appendChild(btn);
+            });
+
+            // 초기화
+            document.getElementById('hint-box').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+            
+            // 진행바 업데이트
+            const progress = ((currentIndex) / 10) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        // 정답 체크
+        function checkAnswer(btnElement, selectedIndex, qData) {
+            // 이미 정답을 맞췄다면 클릭 방지
+            if(document.getElementById('next-btn').style.display === 'block') return;
+
+            if (selectedIndex === qData.a) {
+                // 정답
+                btnElement.classList.add('correct');
+                btnElement.innerText = "⭕ " + btnElement.innerText;
+                
+                // 모든 보기 클릭 방지 (시각적 처리)
+                const allBtns = document.querySelectorAll('.option-btn');
+                allBtns.forEach(b => b.style.cursor = 'default');
+
+                document.getElementById('next-btn').style.display = 'inline-block';
+            } else {
+                // 오답
+                btnElement.classList.add('wrong');
+                btnElement.innerText = "❌ " + btnElement.innerText;
+                btnElement.onclick = null; // 틀린 것 다시 클릭 방지
+                
+                // 힌트 표시
+                const hintBox = document.getElementById('hint-box');
+                document.getElementById('hint-text').innerText = qData.hint;
+                hintBox.style.display = 'block';
+            }
+        }
+
+        // 다음 문제로
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < 10) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // 퀴즈 종료
+        function finishQuiz() {
+            const endTime = new Date();
+            const timeDiff = endTime - startTime; // 밀리초
+            
+            // 시간 포맷팅 (시:분:초)
+            const seconds = Math.floor((timeDiff / 1000) % 60);
+            const minutes = Math.floor((timeDiff / (1000 * 60)) % 60);
+            const hours = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
+
+            const formattedTime = 
+                (hours < 10 ? "0" + hours : hours) + "시간 " + 
+                (minutes < 10 ? "0" + minutes : minutes) + "분 " + 
+                (seconds < 10 ? "0" + seconds : seconds) + "초";
+
+            document.getElementById('final-time').innerText = formattedTime;
+
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+        }
+
+    </script>
+</body>
+</html>
